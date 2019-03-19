@@ -4,8 +4,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-image1 = cv2.imread("dynamic/images/img1.jpg",0)
-image2 = cv2.imread("dynamic/images/img2.jpg",0)
+image1 = cv2.imread("static/images/img1.jpg",0)
+image2 = cv2.imread("static/images/img2.jpg",0)
 image1 = cv2.resize(image1,(650,550))
 image2 = cv2.resize(image2,(650,550))
 
@@ -32,12 +32,23 @@ draw_params= dict(matchColor=(0,0,255),singlePointColor=(255,0,0),matchesMask=ma
 flann_matches = cv2.drawMatchesKnn(image1,kp1,image2,kp2,matches,None,**draw_params)          
 
 cv2.destroyAllWindows()
-cv2.imwrite('dynamic/images/compare.jpg',flann_matches)
+cv2.imwrite('static/images/compare.jpg',flann_matches)
 
 
 from flask import Flask, render_template, request, url_for, redirect
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
 
 @app.route('/')
 def hello_there():
